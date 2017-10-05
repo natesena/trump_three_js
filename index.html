@@ -19,6 +19,7 @@
             light.position.set( 0, 10, 0 );
             
             scene.add( light );
+            var time = 0;
 
             var objects = [];
             
@@ -79,7 +80,11 @@
 			var animate = function () {
 				requestAnimationFrame( animate );
                 controls.update();
-				renderer.render(scene, camera);
+                renderer.render(scene, camera);
+                objects.forEach(function(obj){
+                    
+                })
+                
 			};
 
 			animate();
