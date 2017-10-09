@@ -11,10 +11,18 @@
         <script src="js/three.min.js"></script>
         <script src="js/objVertexColors.js"></script>
         <script src="js/trackballControl.js"></script>
+        <script src="js/CubemapToEquirectangular.js"></script>
 		<script>
             var scene = new THREE.Scene();
             scene.background = new THREE.Color( 0xffffff );
-			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+            var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+            var renderer = new THREE.WebGLRenderer();
+            var equiManaged = new CubemapToEquirectangular( renderer, true );
+            var recording = false
+            var screenShots = 0
+
+
+
             var light = new THREE.PointLight( 0xff00ff, 1, 100 );
             light.position.set( 0, 10, 0 );
             
@@ -23,7 +31,7 @@
 
             var objects = [];
             
-            var renderer = new THREE.WebGLRenderer();
+            
             
             controls = new THREE.TrackballControls(camera);
             controls.rotateSpeed = 4.0;
@@ -52,7 +60,25 @@
             var onError = function (xhr) {
             };
 
+            function randomPos(freedom){
+                return `${freedom*Math.random()}`
+            }
 
+            function rainObj(obj, number, x, y, z){
+                for(var i = 0; i < number; i++){
+                    var newClone = obj.children[0].clone() 
+                    newClone.position.x = randomPos(x);
+                    newClone.position.y = randomPos(y);
+                    newClone.position.z = randomPos(z);
+                    objects.push(newClone)
+                    scene.add(newClone)
+                }
+            }
+
+            function animationToggle(){
+                recording = !recording
+            }
+            
             
             
             var loader = new THREE.OBJVertexColorLoader(manager);
@@ -69,9 +95,14 @@
                 scene.add(object);
                 
             }, onProgress, onError);
+
+            
+
+
             var light = new THREE.PointLight( 0xffff00, 1, 100 );
             light.position.set( 50, 50, 50 );
             scene.add( light );
+
 
 			
 
@@ -82,9 +113,12 @@
                 controls.update();
                 renderer.render(scene, camera);
                 objects.forEach(function(obj){
-                    
+                    obj.rotation.x +=.1
                 })
-                
+                if(recording){
+                    equiManaged.update(camera,scene)
+                    screenShots++
+                }
 			};
 
 			animate();
