@@ -157,7 +157,8 @@
         this.canvas.toBlob( function( blob ) {
     
             var url = URL.createObjectURL(blob);
-            var fileName = 'pano-' + document.title + '-' + Date.now() + '.png';
+            //used to have Date.now()  below
+            var fileName = 'pano-' + document.title + '-' + String("00000" + screenShots).slice(-5) + '.png';
             var anchor = document.createElement( 'a' );
             anchor.href = url;
             anchor.setAttribute("download", fileName);
@@ -177,7 +178,7 @@
     CubemapToEquirectangular.prototype.update = function( camera, scene ) {
     
         var autoClear = this.renderer.autoClear;
-        this.renderer.autoClear = true;
+        this.renderer.autoClear = false;//originally true -------------------------------
         this.cubeCamera.position.copy( camera.position );
         this.cubeCamera.updateCubeMap( this.renderer, scene );
         this.renderer.autoClear = autoClear;
