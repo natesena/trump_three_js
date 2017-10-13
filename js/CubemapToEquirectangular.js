@@ -47,6 +47,8 @@
         this.height = 1;
     
         this.renderer = renderer;
+
+        
     
         this.material = new THREE.RawShaderMaterial( {
             uniforms: {

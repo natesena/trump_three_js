@@ -2,8 +2,30 @@
 	<head>
 		<title>My first three.js app</title>
 		<style>
-			body { margin: 0; }
-			canvas { width: 100%; height: 100% }
+			body { 
+                margin: 0; 
+                
+            }
+			canvas { 
+                width: 100%; 
+                height: 100%;
+                z-index: 0;
+            }
+            .controls {
+                position:absolute;
+                height:100px;
+                background-color: gray;
+                z-index:5;
+                padding: 10px;
+                display: inline-block
+            }
+
+            canvas {
+                position: absolute;
+            }
+            #frames {
+                padding: 15px
+            }
 		</style>
 	</head>
 	<body>
@@ -12,14 +34,25 @@
         <script src="js/objVertexColors.js"></script>
         <script src="js/trackballControl.js"></script>
         <script src="js/CubemapToEquirectangular.js"></script>
+        
+        <div class="controls">    
+            <form class="record-controls">
+                <input type="text" id="frames" value="300">
+               
+            </form>
+            <button onclick="record()">Record</button>
+        </div>
+        
 		<script>
             var scene = new THREE.Scene();
             scene.background = new THREE.Color( 0xffffff );
             var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-            var renderer = new THREE.WebGLRenderer();
+            var renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
+            //renderer.autoClearColor = false
             var equiManaged = new CubemapToEquirectangular( renderer, true );
             var recording = false
             var screenShots = 0
+            var recordLength = document.getElementById('frames').value
 
 
 
@@ -60,40 +93,39 @@
             var onError = function (xhr) {
             };
 
-            function randomPos(freedom){
-                return `${freedom*Math.random()}`
-            }
+            
 
             function rainObj(obj, number, x, y, z){
                 for(var i = 0; i < number; i++){
                     var newClone = obj.children[0].clone() 
-                    newClone.position.x = randomPos(x);
-                    newClone.position.y = randomPos(y);
-                    newClone.position.z = randomPos(z);
+                    newClone.position.x = (x * Math.random())*(Math.round(Math.random() *2) - 1);
+                    newClone.position.y = (y * Math.random())*(Math.round(Math.random() *2) - 1);
+                    newClone.position.z = (z * Math.random())*(Math.round(Math.random() *2) - 1);
                     objects.push(newClone)
                     scene.add(newClone)
                 }
             }
 
-            function animationToggle(){
+            function record(){
+                console.log(recordLength)
                 recording = !recording
             }
+
+         
             
             
             
             var loader = new THREE.OBJVertexColorLoader(manager);
-            loader.load('models/Trump2.obj', function (object) {
+            loader.load('models/Olivia_freal.obj', function (object) {
                 object.traverse(function(node){
                     if(node.material){
                         node.material.side = THREE.DoubleSide;
                     }
                 })
-                window.trump = object;
+                window.model = object;
                 object.rotation.x = Math.PI;
                 object.rotation.y = Math.PI;
                 console.dir(object);
-                scene.add(object);
-                
             }, onProgress, onError);
 
             
@@ -118,10 +150,14 @@
                 if(recording){
                     equiManaged.update(camera,scene)
                     screenShots++
+                    if(screenShots > recordLength){
+                        record()
+                    }
                 }
 			};
 
 			animate();
-		</script>
+        </script>
+        
 	</body>
 </html>
